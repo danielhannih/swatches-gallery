@@ -1,0 +1,9 @@
+version: '3.7'
+
+services:
+    hugo:
+        build:
+            context: ./
+        entrypoint: 'hugo --minify --config ./hugo-prod.toml'
+        volumes:
+            - '.:/src'

@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="{{ .Site.LanguageCode }}">
+<head>
+
+  {{ $styles := (((resources.Get "home.scss") | toCSS | postCSS (dict "use" "autoprefixer") | minify) | resources.ExecuteAsTemplate "style.css" . | resources.ToCSS | resources.Fingerprint "sha512").RelPermalink }}
+  {{ $app := (((resources.Get "app.js") | minify) | resources.ExecuteAsTemplate "app.js" . | resources.Fingerprint "sha512").RelPermalink }}
+
+  <title>Swatches Gallery</title>
+  <meta name="description" content="Some SEO description">
+  <meta name="viewport" content="width=device-width">
+  <link rel="canonical" href="{{ .Permalink }}">
+
+  <!-- Preload resources -->
+  <link rel="preload" href="{{ $styles }}" as="style">
+  <link rel="preload" href="{{ $app }}" as="script">
+
+  <!-- Resources -->
+  <link rel="stylesheet" type="text/css" href="{{ $styles }}">
+
+</head>
+
+<body>
+  {{ partial "home" . }}
+  <script src="{{ $app }}"></script>
+</body>
+
+</html>
