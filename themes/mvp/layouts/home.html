@@ -3,8 +3,8 @@
 <head>
 
   <!-- Hugo Stuff -->
-  {{ $styles := (((resources.Get "home.scss") | toCSS | postCSS (dict "use" "autoprefixer") | minify) | resources.ExecuteAsTemplate "style.css" . | resources.ToCSS | resources.Fingerprint "sha512").RelPermalink }}
-  {{ $app := (((resources.Get "app.js") | minify) | resources.ExecuteAsTemplate "app.js" . | resources.Fingerprint "sha512").RelPermalink }}
+  {{ $styles := (((resources.Get "home.scss") | toCSS | postCSS (dict "use" "autoprefixer") | minify) | resources.ExecuteAsTemplate "style.css" . | resources.ToCSS | resources.Fingerprint "sha512") }}
+  {{ $app := resources.Get "app.js" | minify | resources.Fingerprint "sha512" }}
 
   <!-- Basic HTML -->
   <title>{{ .Params.seo_title }}</title>
@@ -36,17 +36,17 @@
   <meta property="og:image:height" content="630" />
 
   <!-- Preload resources -->
-  <link rel="preload" href="{{ $styles }}" as="style">
-  <link rel="preload" href="{{ $app }}" as="script">
+  <link rel="preload" href="{{ $styles.RelPermalink }}" as="style">
+  <link rel="preload" href="{{ $app.RelPermalink }}" as="script">
 
   <!-- Resources -->
-  <link rel="stylesheet" type="text/css" href="{{ $styles }}">
+  <link rel="stylesheet" type="text/css" href="{{ $styles.RelPermalink }}" integrity="{{ $styles.Data.Integrity }}">
 
 </head>
 
 <body>
   {{ partial "home" . }}
-  <script src="{{ $app }}"></script>
+  <script src="{{ $app.RelPermalink }}" integrity="{{ $app.Data.Integrity }}"></script>
 </body>
 
 </html>
