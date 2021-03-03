@@ -52,13 +52,13 @@
   <link rel="preload" href="{{ $app.RelPermalink }}" as="script">
 
   <!-- Resources -->
-  <link rel="stylesheet" type="text/css" href="{{ $styles.RelPermalink }}" integrity="{{ $styles.Data.Integrity }}">
+  <link rel="stylesheet" type="text/css" href="{{ $styles.RelPermalink }}">
 
 </head>
 
 <body>
   {{ partial "home" . }}
-  <script src="{{ $app.RelPermalink }}" integrity="{{ $app.Data.Integrity }}"></script>
+  <script src="{{ $app.RelPermalink }}"></script>
 </body>
 
 </html>
