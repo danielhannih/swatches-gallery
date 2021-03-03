@@ -236,8 +236,46 @@ const createTile = (item=false) => {
 
   }
 
-  put([codeToggle(codeValues)],swatch)
+  put([fullscreenButton(swatch),codeToggle(codeValues)],swatch)
   return wrap
+}
+
+const fullscreenButton = (swatch) => {
+  let btn = make("div",["fullscreen-btn"])
+
+
+
+  btn.addEventListener("click",() => openFullscreen(swatch))
+  return btn
+}
+
+const hideSwatchControls = (swatch) => {
+
+  let childs = [swatch.querySelector(".css-toggle"),swatch.querySelector(".fullscreen-btn")]
+
+  childs.forEach((e) => e.style.opacity = 0)
+
+  swatch.addEventListener("fullscreenchange", (event) => {
+
+    if (document.fullscreenElement) {
+
+    } else {
+      childs.forEach((e) => e.style.opacity = null)
+    }
+  })
+}
+
+const openFullscreen = (e) => {
+  if (e.requestFullscreen) {
+    e.requestFullscreen()
+    hideSwatchControls(e)
+  } else if (e.webkitRequestFullscreen) {
+    elem.webkitRequestFullscreen()
+    hideSwatchControls(e)
+  } else if (e.msRequestFullscreen) {
+    e.msRequestFullscreen()
+    hideSwatchControls(e)
+  }
 }
 
 const codeToggle = (codeValues) => {
@@ -248,7 +286,6 @@ const codeToggle = (codeValues) => {
 }
 
 const createCSSCode = (obj,prefixer) => {
-  // linear-gradient
   let x = `
   <span class="p">background:</span> <span class="b">${prefixer}</span>(<span class="o">${obj.deg}deg</span>, <span class="o">${obj.s1.slice(0,1)}</span><span class="b">${obj.s1.slice(1).toUpperCase()}</span> <span class="o">0%</span>, <span class="o">${obj.s2.slice(0,1)}</span><span class="b">${obj.s2.slice(1).toUpperCase()}</span> <span class="o">100%</span>)<span class="p">;</span>`
   return x
