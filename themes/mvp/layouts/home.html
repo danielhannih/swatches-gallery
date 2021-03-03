@@ -50,6 +50,7 @@
   <!-- Preload resources -->
   <link rel="preload" href="{{ $styles.RelPermalink }}" as="style">
   <link rel="preload" href="{{ $app.RelPermalink }}" as="script">
+  <link rel="preload" href="/img/heart.svg" as="image">
 
   <!-- Resources -->
   <link rel="stylesheet" type="text/css" href="{{ $styles.RelPermalink }}">
@@ -58,7 +59,7 @@
 
 <body>
   {{ partial "home" . }}
-  <script src="{{ $app.RelPermalink }}"></script>
+  <script defer src="{{ $app.RelPermalink }}"></script>
 </body>
 
 </html>

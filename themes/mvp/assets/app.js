@@ -5,6 +5,7 @@ const favs = document.querySelector("main.favorites")
 const controls = document.querySelector(".control")
 
 
+
 // Framework functions
 const put = (a, p) => a.forEach((e, i) => p.appendChild(a[i]))
 const make = (e, a = []) => {
@@ -33,7 +34,7 @@ const msg = (msg) => {
 
 
 // Copy to clipboard
-const copyToClipboard = (str) => {
+const copyToClipboard = (str,custom=false) => {
   const el = make("textarea")
   el.value = str
   el.setAttribute("readonly","")
@@ -42,8 +43,12 @@ const copyToClipboard = (str) => {
   put([el],body)
   el.select()
   document.execCommand("copy")
-  document.body.removeChild(el)
-  msg(`👌 Copied to clipboard: ${str}`)
+  body.removeChild(el)
+  if (custom) {
+    msg(`👌 Copied to clipboard!`)
+  } else {
+    msg(`👌 Copied to clipboard: ${str}`)
+  }
 }
 
 const encode = (e) => btoa(e)
@@ -59,6 +64,7 @@ const hsl = (h,w,b) => `hsl(${h},${w}%, ${b}%)`
 
 // Return gradient style
 const gradient = (deg,v1,v2) => `linear-gradient(${deg}deg,${v1}0%,${v2} 100%)`
+const gradientID = (deg,v1,v2) => `${deg}${v1}${v2}`
 
 
 
@@ -101,23 +107,24 @@ const getSaturation = () => randomNumberBetween(gradientTypeSaturation[0],gradie
 
 const storageID = "swatch-gallery-favorites"
 const saveToStorage = (d) => localStorage.setItem(storageID,JSON.stringify(d))
-const storageStructure = (id,v1,v2) => {
+const storageStructure = (id,v1,v2,deg) => {
   let x = {
     id: id,
-    hex: [v1,v2]
+    hex: [v1,v2],
+    deg: deg
   }
   return x
 }
 
 const hasFavorites = () => null != localStorage.getItem(storageID)
 
-const favoriteGradient = (id,v1,v2) => {
+const favoriteGradient = (id,v1,v2,deg) => {
   if (hasFavorites()) {
     let stored = JSON.parse(localStorage.getItem(storageID))
     // Get index of ID -> if -1 -> its not in the array
     let indexOfID = stored.map(e => e.id).indexOf(id)
     if (indexOfID == -1) {
-      stored.push(storageStructure(id,v1,v2))
+      stored.push(storageStructure(id,v1,v2,deg))
     } else {
       stored.splice(indexOfID,1)
       // remove heart from main gallery
@@ -126,7 +133,7 @@ const favoriteGradient = (id,v1,v2) => {
     saveToStorage(stored)
   } else {
     let x = []
-    x.push(storageStructure(id,v1,v2))
+    x.push(storageStructure(id,v1,v2,deg))
     saveToStorage(x)
   }
   createFavoriteGallery()
@@ -140,7 +147,7 @@ const favoriteGradient = (id,v1,v2) => {
 
 
 // Create swatch info
-const createSwatchInfo = (swatches=[],id) => {
+const createSwatchInfo = (swatches=[],id,deg) => {
   let info = make("div",["info"]),
   stopsWrap = make("div",["stops-wrap"]),
   favorite = make("div",["favorite-wrap"]),
@@ -156,7 +163,7 @@ const createSwatchInfo = (swatches=[],id) => {
 
   favoriteBtn.addEventListener("click",() => {
     favoriteBtn.classList.toggle("active")
-    favoriteGradient(id,swatches[0],swatches[1])
+    favoriteGradient(id,swatches[0],swatches[1],deg)
     if (!favoriteBtn.classList.contains("active")) {
       let mainGalleryItemWithSameID = document.querySelector(`[data-id="${id}"] .active`)
       if (mainGalleryItemWithSameID !== null) {
@@ -194,7 +201,8 @@ const createTile = (item=false) => {
   let
   wrap = make("div",["wrap"]),
   swatch = make("div",["swatch"]),
-  info = make("div",["info"])
+  info = make("div",["info"]),
+  codeValues = {}
   if (item == false) {
     let baseTint = getBaseTint(),
     baseSaturation = getSaturation(),
@@ -206,23 +214,95 @@ const createTile = (item=false) => {
     baseHSL = hsl(baseTint,baseSaturation,baseLightValue),
     shiftedHSL = hsl(shiftedTint,shiftedSaturation,shiftedLightValue),
     finalGradient = gradient(gredientAngle,baseHSL,shiftedHSL),
-    id = encode(finalGradient),
     color1 = hsl_Hex(baseTint,baseSaturation,baseLightValue),
-    color2 = hsl_Hex(shiftedTint,shiftedSaturation,shiftedLightValue)
+    color2 = hsl_Hex(shiftedTint,shiftedSaturation,shiftedLightValue),
+    id = encode(gradientID(gredientAngle,color1,color2))
+
     swatch.style.backgroundImage = finalGradient
     wrap.setAttribute("data-id",id)
-    put([swatch,createSwatchInfo([color1,color2],id)],wrap)
+    put([swatch,createSwatchInfo([color1,color2],id,gredientAngle)],wrap)
+
+    codeValues.deg = gredientAngle
+    codeValues.s1 = color1
+    codeValues.s2 = color2
+
   } else {
-    swatch.style.backgroundImage = decode(item.id)
-    put([swatch,createSwatchInfo([item.hex[0],item.hex[1]],item.id)],wrap)
+    swatch.style.backgroundImage = `linear-gradient(${item.deg}deg,${item.hex[0]} 0%,${item.hex[1]} 100%)`
+    put([swatch,createSwatchInfo([item.hex[0],item.hex[1]],item.id,item.deg)],wrap)
+
+    codeValues.deg = item.deg
+    codeValues.s1 = item.hex[0]
+    codeValues.s2 = item.hex[1]
+
   }
+
+  put([codeToggle(codeValues)],swatch)
   return wrap
+}
+
+const codeToggle = (codeValues) => {
+  let toggle = make("div",["css-toggle"])
+  toggle.innerText = "CSS"
+  toggle.addEventListener("click",() => showCodeOverlay(codeValues))
+  return toggle
+}
+
+const createCSSCode = (obj,prefixer) => {
+  // linear-gradient
+  let x = `
+  <span class="p">background:</span> <span class="b">${prefixer}</span>(<span class="o">${obj.deg}deg</span>, <span class="o">${obj.s1.slice(0,1)}</span><span class="b">${obj.s1.slice(1).toUpperCase()}</span> <span class="o">0%</span>, <span class="o">${obj.s2.slice(0,1)}</span><span class="b">${obj.s2.slice(1).toUpperCase()}</span> <span class="o">100%</span>)<span class="p">;</span>`
+  return x
+}
+
+
+const closeMultipleElements = (array) => array.forEach((e) => closeElement(e))
+
+const closeElement = (e) => {
+  e.style.opacity = 0
+  setTimeout(() => e.remove(), 350)
+}
+
+const showCodeOverlay = (obj) => {
+  let overlay = make("div",["code-overlay"]),
+  overlayBackdrop = make("div",["code-overlay-backdrop"]),
+  headline = make("div",["headline"]),
+  codeBlock = make("code"),
+  copyCode = make("div",["copy-cta"]),
+  closeOverlay = make("div",["close-overlay"]),
+  closeOverlayIcon = make("i"),
+  closeButtons = [closeOverlay,overlayBackdrop],
+  closeableElements = [overlay,overlayBackdrop]
+
+  headline.innerText = "Copy CSS code"
+  copyCode.innerText = "Copy CSS"
+  codeBlock.innerHTML = `
+    ${createCSSCode(obj,"linear-gradient")}
+    <br>
+    <br>
+    <i>// For older Browsers:</i><br>
+    ${createCSSCode(obj,"-webkit-linear-gradient")}
+    <br>
+    ${createCSSCode(obj,"-moz-linear-gradient")}
+    <br>
+    ${createCSSCode(obj,"-o-linear-gradient")}
+    `
+
+  overlay.style.opacity = 0
+  setTimeout(() => overlay.style.opacity = 1, 1)
+  closeButtons.forEach((btn) => btn.addEventListener("click",() => closeMultipleElements(closeableElements)))
+
+  copyCode.addEventListener("click",() => copyToClipboard(codeBlock.innerText,true))
+
+  put([closeOverlayIcon],closeOverlay)
+  put([closeOverlay,headline,codeBlock,copyCode],overlay)
+  put([overlayBackdrop,overlay],body)
 }
 
 
 
 // Populate galleries
 const createMainGallery = (n) => {
+  main.innerHTML = ""
   let i = 0
   while (i < n) {
     put([createTile()],main)
@@ -248,15 +328,15 @@ const createFavoriteGallery = () => {
 
 
 const setGlobalGradientType = () => {
-  gradientTypeHue = globals.gradientTypes[gradientType].hue
-  gradientTypeSaturation = globals.gradientTypes[gradientType].saturation
-  gradientTypeLight = globals.gradientTypes[gradientType].light
+  gradientTypeHue = globals.T[gradientType].hue
+  gradientTypeSaturation = globals.T[gradientType].saturation
+  gradientTypeLight = globals.T[gradientType].light
 }
 
 const repopulateMainGallery = () => {
-  main.innerHTML = ""
+
   createMainGallery(globals.swatchCount)
-  msg(`✨ Generated ${globals.gradientTypes[gradientType].name} Gallery.`)
+  msg(`✨ Generated ${globals.T[gradientType].name} Gallery.`)
 }
 
 const generateNewGalleryButton = () => {
@@ -270,9 +350,9 @@ const gradientSwitcher = () => {
   let switcher = make("div",["switcher"]),
   activeIndicator = make("div",["active-switcher",gradientType])
   put([activeIndicator],switcher)
-  for (const [key, value] of Object.entries(globals.gradientTypes)) {
+  for (const [key, value] of Object.entries(globals.T)) {
     let item = make("div",["item"])
-    item.innerText = globals.gradientTypes[key].name
+    item.innerText = globals.T[key].name
     if (gradientType == key) {
       item.classList.add("active-select")
     }
@@ -288,28 +368,30 @@ const gradientSwitcher = () => {
   return switcher
 }
 
-const cssToggle = () => {
-  let toggle = make("div",["css-toggle"])
-  toggle.innerText = "CSS Toggle"
-  return toggle
-}
+const createTopLevelControls = () => put([gradientSwitcher(),generateNewGalleryButton()],controls)
 
-const settings = () => {
-  let settingsWrap = make("div",["settings"])
 
-  // CSS Toggle -> to copy css of gradient
-  // Show placeholder text in gradient
 
-  settingsWrap.innerText = "Settings"
-  return settingsWrap
-}
+// Settings to toggle CSS and downlaod image
 
-const createTopLevelControls = () => {
 
-  put([gradientSwitcher(),generateNewGalleryButton()],controls)
 
-  // controls
-}
+// const settings = () => {
+//   let settingsWrap = make("div",["settings"])
+//
+//   // CSS Toggle -> to copy css of gradient
+//   // Show placeholder text in gradient
+//
+//   settingsWrap.innerText = "Settings"
+//   return settingsWrap
+// }
+
+
+
+
+
+
+
 
 const init = () => {
   createTopLevelControls()
@@ -320,7 +402,7 @@ const init = () => {
 let globals = {
   swatchCount: 64,
   css: false,
-  gradientTypes: {
+  T: {
     vibrant: {
       name: "Vibrant",
       hue: [0,360],
@@ -343,10 +425,10 @@ let globals = {
 }
 
 let
-gradientType = "vibrant"
-gradientTypeHue = globals.gradientTypes[gradientType].hue,
-gradientTypeSaturation = globals.gradientTypes[gradientType].saturation,
-gradientTypeLight = globals.gradientTypes[gradientType].light
+gradientType = "vibrant",
+gradientTypeHue = globals.T[gradientType].hue,
+gradientTypeSaturation = globals.T[gradientType].saturation,
+gradientTypeLight = globals.T[gradientType].light
 
 
 
