@@ -9,6 +9,7 @@ cssrelativeurl = true
 
 
 [params]
+siteName = "swatches.gallery"
 
 
 [taxonomies] # turn those tax mofos off
