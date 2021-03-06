@@ -5,6 +5,32 @@ const favs = document.querySelector("main.favorites")
 const controls = document.querySelector(".control")
 
 
+// Globals
+let globals = {
+  swatchCount: 64,
+  css: false,
+  T: {
+    vibrant: {
+      name: "Vibrant",
+      hue: [0,360],
+      saturation: [97,100],
+      light: [49,56]
+    },
+    pastel: {
+      name: "Pastel",
+      hue: [0,360],
+      saturation: [80,100],
+      light: [62,82]
+    },
+    random: {
+      name: "Random",
+      hue: [0,360],
+      saturation: [0,100],
+      light: [0,100]
+    }
+  }
+}
+
 
 // Framework functions
 const put = (a, p) => a.forEach((e, i) => p.appendChild(a[i]))
@@ -434,31 +460,6 @@ const init = () => {
   createTopLevelControls()
   createMainGallery(globals.swatchCount)
   createFavoriteGallery()
-}
-
-let globals = {
-  swatchCount: 64,
-  css: false,
-  T: {
-    vibrant: {
-      name: "Vibrant",
-      hue: [0,360],
-      saturation: [97,100],
-      light: [49,56]
-    },
-    pastel: {
-      name: "Pastel",
-      hue: [0,360],
-      saturation: [80,100],
-      light: [62,82]
-    },
-    random: {
-      name: "Random",
-      hue: [0,360],
-      saturation: [0,100],
-      light: [0,100]
-    }
-  }
 }
 
 let
