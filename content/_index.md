@@ -19,10 +19,3 @@ And if you're particularly fond of a gradient, add it to your favorites and star
 Created & maintained by <a target="_blank" rel="noopener" title="Website of Daniel Hannih" href="https://danielhannih.com">Daniel Hannih</a>.
 
 If you have any feedback, or just want to get in touch, tickle my inbox: <a target="_top" href="mailto:daniel.mitteregger@gmail.com?Subject=Hello%20Daniel" title="Contact Daniel Hannih via Email">Send Email</a>
-
-
-<!--
-## Gradient Generator
-dasdas
-
-Are you looking for vibrant gradients? You have come to the right place. -->

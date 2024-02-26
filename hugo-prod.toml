@@ -1,25 +1,11 @@
 baseURL = "https://swatches.gallery/"
-defaultContentLanguage ="en"
-theme = "mvp"
 enableRobotsTXT = true
 disableHugoGeneratorInject = true
-
-uglyURLs = false
-cssrelativeurl = true
-
+disableKinds = ["taxonomy", "taxonomyTerm"]
+publishDir = "docs"
 
 [params]
 siteName = "swatches.gallery"
 
-
-[taxonomies] # turn those tax mofos off
-tag = ""
-category = ""
-
-[languages]
-[languages.en]
-languageName = "English"
-languageCode = "en"
-contentDir = "content/en"
-weight = 0
-title = "Now ship it."
+[markup.goldmark.renderer]
+unsafe = true

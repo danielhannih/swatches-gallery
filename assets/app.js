@@ -1,8 +1,11 @@
+(() => {
+
 // Elements
-const body = document.body
-const main = document.querySelector("main.generated")
-const favs = document.querySelector("main.favorites")
-const controls = document.querySelector(".control")
+const Document = document
+const body = Document.body
+const main = Document.querySelector("main.generated")
+const favs = Document.querySelector("main.favorites")
+const controls = Document.querySelector(".control")
 
 
 // Globals
@@ -35,7 +38,7 @@ let globals = {
 // Framework functions
 const put = (a, p) => a.forEach((e, i) => p.appendChild(a[i]))
 const make = (e, a = []) => {
-  let x = document.createElement(e)
+  let x = Document.createElement(e)
   a.forEach((e, c) => x.classList.add(a[c]))
   return x
 }
@@ -46,7 +49,7 @@ const createID = () => `${id()}-${id()}-${id()}`
 
 // Notification Message
 const msg = (msg) => {
-  let previousMsg = document.querySelector(".notification-message")
+  let previousMsg = Document.querySelector(".notification-message")
   if (previousMsg != null) {
     previousMsg.remove()
   }
@@ -68,7 +71,7 @@ const copyToClipboard = (str,custom=false) => {
   el.style.left = "-9999px"
   put([el],body)
   el.select()
-  document.execCommand("copy")
+  Document.execCommand("copy")
   body.removeChild(el)
   if (custom) {
     msg(`👌 Copied to clipboard!`)
@@ -191,7 +194,7 @@ const createSwatchInfo = (swatches=[],id,deg) => {
     favoriteBtn.classList.toggle("active")
     favoriteGradient(id,swatches[0],swatches[1],deg)
     if (!favoriteBtn.classList.contains("active")) {
-      let mainGalleryItemWithSameID = document.querySelector(`[data-id="${id}"] .active`)
+      let mainGalleryItemWithSameID = Document.querySelector(`[data-id="${id}"] .active`)
       if (mainGalleryItemWithSameID !== null) {
         mainGalleryItemWithSameID.classList.toggle("active")
       }
@@ -283,7 +286,7 @@ const hideSwatchControls = (swatch) => {
 
   swatch.addEventListener("fullscreenchange", (event) => {
 
-    if (document.fullscreenElement) {
+    if (Document.fullscreenElement) {
 
     } else {
       childs.forEach((e) => e.style.opacity = null)
@@ -475,3 +478,6 @@ gradientTypeLight = globals.T[gradientType].light
 
 
 init()
+
+
+})()
