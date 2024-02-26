@@ -1,6 +1,5 @@
 **/.DS_Store
 resources/
-public/
 node_modules/
 
 
@@ -72,7 +71,6 @@ node_modules/
 .env
 
 
-public/
 resources/
 .DS_Store
 notes.md
